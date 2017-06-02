@@ -1,10 +1,20 @@
-const margin = {top: 20, right: 20, bottom: 30, left: 50},
+const margin = {top: 20, right: 80, bottom: 100, left: 50},
     width = 960 - margin.left - margin.right,
-    height = 500 - margin.top - margin.bottom;
+    height = 500 - margin.top - 50;
+
+// for mouse-move event
+let bisectDate = d3.bisector(function(d) { return d.timeStr; }).left;
 
 // convert to right time format
 let parseTime = d3.timeParse("%H:%M:%S.%L");
-let timeFormat = d3.timeFormat("%H:%M:%S.%L");
+
+function convertNanoseconds(nano) {
+    let h = Math.floor(nano/3600000000000);
+    let m = Math.floor((nano/3600000000000)%1*60);
+    let s = ((nano/3600000000000)%1*60%1*60).toFixed(3);
+    let hms = (h+ ":"+m+":"+s);
+    return parseTime(hms);
+};
 
 // scale
 const x = d3.scaleTime().range([0, width]);
@@ -55,8 +65,34 @@ let zoom = d3.zoom()
     .translateExtent([[0, 0], [width, height]])
     .on("zoom", zoomHandler);
 
+// tradeList Mouse-over
+function handleTradeMouseOver(d){
+    d3.select('.infobox').text(
+        "Order: " + d.orderReferenceNumber + ", Type: " + d.tradeType +
+        ", Price: " + d.price + ", Shares: " + d.shares);
+}
+
+// orderReferenceNumber, price, shares, tradeType
+
+// legend on click
+function handleClickE(){
+    let e = d3.selectAll('.E'); // select all tradeType E
+    e.classed('hidden', !e.classed('hidden')); // toggle class hidden
+    // change legend color
+    let legendE = d3.select('.legend-E');
+    legendE.classed('inactive', !legendE.classed('inactive'));
+};
+
+function handleClickP(){
+    let p = d3.selectAll('.P'); // select all tradeType E
+    p.classed('hidden', !p.classed('hidden')); // toggle class hidden
+    // change legend color
+    let legendP = d3.select('.legend-P');
+    legendP.classed('inactive', !legendP.classed('inactive'));
+};
+
 // canvas
-const svg = d3.select("body").append("svg")
+const svg = d3.select("#root").append("svg")
     .attr("width", width + margin.left + margin.right)
     .attr("height", height + margin.top + margin.bottom)
     .append("g")
@@ -79,11 +115,8 @@ d3.json('stock.json', (json) => {
     tradeList.forEach((obj) => {
         obj.price = obj.price / 10000;
         obj.shares = +obj.shares;
-        obj.time = parseTime(timeFormat(obj.time));
+        obj.time = convertNanoseconds(obj.time);
     });
-
-    //console.log(tradeList);
-
 
     // scale the domain
     x.domain(d3.extent(data, (d) => {return d.timeStr}));
@@ -116,14 +149,6 @@ d3.json('stock.json', (json) => {
         .attr("d", bidLine)
         .attr("class", "line");
 
-    // add circle
-    svg.selectAll("dot")
-        .data(tradeList)
-        .enter()
-        .append("circle")
-        .attr("r", 2)
-        .attr("cx", (d) => {return x(d.time)})
-        .attr("cy", (d) => {return y(d.price)});
 
     // add Axis
     svg.append("g")
@@ -133,6 +158,93 @@ d3.json('stock.json', (json) => {
     
     svg.append("g")
         .call(yAxis);
+
+    // y axis title
+    svg.append("text")
+        .attr("transform", "translate(15, 60)rotate(-90)")
+        .text("Price($)");
+
+    // add legend
+    let legend = svg.append("g")
+        .attr("transform", "translate(" + (width*0.4) + "," + (height + 30) + ")");
+    
+    // E
+    legend.append("circle")
+        .attr("class", "legend-E")
+        .attr("r", 5).attr("cx", 10).attr("cy", 13)
+        .on("click", handleClickE);;
+    
+    legend.append("text")
+        .attr("x", 20).attr("y", 18)
+        .text("Type E")
+        .on("click", handleClickE);
+    
+    // P
+    legend.append("circle")
+        .attr("class", "legend-P")
+        .attr("r", 5).attr("cx", 100).attr("cy", 13)
+        .on("click", handleClickP);;;
+
+    legend.append("text")
+        .attr("x", 115).attr("y", 18)
+        .text("Type P")
+        .on("click", handleClickP);
+
+    // add tradeType info box on hover
+    let infoBox = svg.append("g")
+        .attr("transform", "translate("+ (width*0.35) + "," + (height - 50) + ")");
+    
+    infoBox.append("text")
+        .attr("class", "infobox");
+
+    // mouse-over event
+    let mouseLine = svg.append("g");
+
+    mouseLine.append("line")
+        .attr("class", "x-hover-line hover-line")
+        .attr("y1", height)
+        .attr("y2", 0);
+    
+    mouseLine.append("text")
+        .attr("class", "text-ask")
+        .attr("x", 15)
+        .attr("y", 50);
+    
+    mouseLine.append("text")
+        .attr("class", "text-bid")
+        .attr("x", 15)
+        .attr("y", 70);
+
+    svg.append("rect")
+        .attr("class", "overlay")
+        .attr("width", width)
+        .attr("height", height)
+        .on("mouseover", () => { mouseLine.style("display", null); })
+        .on("mouseout", () => { mouseLine.style("display", "none"); })
+        .on("mousemove", mousemove);
+
+    function mousemove() {
+        var x0 = x.invert(d3.mouse(this)[0]),
+            i = bisectDate(data, x0, 1),
+            d0 = data[i - 1],
+            d1 = data[i],
+            d = x0 - d0.timeStr > d1.timeStr - x0 ? d1 : d0;
+        mouseLine.attr("transform", "translate(" + x(d.timeStr) + ")");
+        mouseLine.select(".text-ask").text(() => { return ("ask :" + d.ask);});
+        mouseLine.select(".text-bid").text(() => { return ("bid :" + d.bid);});
+    }
+
+    // add tradeList circles
+    svg.selectAll("dot")
+        .data(tradeList)
+        .enter()
+        .append("circle")
+        .attr("class", (d) => {return d.tradeType})
+        .attr("r", 2)
+        .attr("cx", (d) => {return x(d.time)})
+        .attr("cy", (d) => {return y(d.price)})
+        .on("mouseover", handleTradeMouseOver)
+        .on("mouseout", () => { d3.select('.infobox').text('')});
 
 });
     //{"time":34574353918784,"price":233200,"shares":100,"tradeType":"E","orderReferenceNumber":13983473}

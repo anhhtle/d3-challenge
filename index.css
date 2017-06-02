@@ -1,3 +1,9 @@
+#root {
+    display: flex;
+    justify-content: center;
+}
+
+/************* area and lines *********/
 .botArea {
     fill: #4F7E56;
 }
@@ -12,4 +18,57 @@
 
 .line {
     fill: none;
+}
+
+/************** tradeList ************/
+.P {
+    fill: red;
+}
+
+/************** legend ***************/
+.legend-container {
+    width: 80px;
+    height: 50px;
+    stroke: black;
+    fill: none;
+}
+
+.legend-E {
+    fill: black;
+}
+
+.legend-P {
+    fill: red;
+}
+
+.hidden {
+    display: none;
+}
+
+.inactive {
+    fill: grey;
+}
+
+/************** mouse-over ***********/
+
+.mouse-line {
+  fill: none;
+  stroke: #6F257F;
+  stroke-width: 5px;
+}
+
+.overlay {
+  fill: none;
+  pointer-events: all;
+}
+
+.focus circle {
+  fill: #F1F3F3;
+  stroke: #6F257F;
+}
+  
+.hover-line {
+  stroke: #6F257F;
+  stroke-width: 2px;
+  stroke-dasharray: 2pt;
 }
