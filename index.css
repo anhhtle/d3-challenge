@@ -33,11 +33,15 @@
     fill: none;
 }
 
-.legend-E {
+.legend:hover {
+    cursor: pointer;
+}
+
+.circle-E {
     fill: black;
 }
 
-.legend-P {
+.circle-P {
     fill: red;
 }
 

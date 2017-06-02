@@ -72,14 +72,12 @@ function handleTradeMouseOver(d){
         ", Price: " + d.price + ", Shares: " + d.shares);
 }
 
-// orderReferenceNumber, price, shares, tradeType
-
 // legend on click
 function handleClickE(){
     let e = d3.selectAll('.E'); // select all tradeType E
     e.classed('hidden', !e.classed('hidden')); // toggle class hidden
     // change legend color
-    let legendE = d3.select('.legend-E');
+    let legendE = d3.select('.circle-E');
     legendE.classed('inactive', !legendE.classed('inactive'));
 };
 
@@ -87,7 +85,7 @@ function handleClickP(){
     let p = d3.selectAll('.P'); // select all tradeType E
     p.classed('hidden', !p.classed('hidden')); // toggle class hidden
     // change legend color
-    let legendP = d3.select('.legend-P');
+    let legendP = d3.select('.circle-P');
     legendP.classed('inactive', !legendP.classed('inactive'));
 };
 
@@ -170,23 +168,25 @@ d3.json('stock.json', (json) => {
     
     // E
     legend.append("circle")
-        .attr("class", "legend-E")
+        .attr("class", "legend circle-E")
         .attr("r", 5).attr("cx", 10).attr("cy", 13)
         .on("click", handleClickE);;
     
     legend.append("text")
         .attr("x", 20).attr("y", 18)
+        .attr("class", "legend")
         .text("Type E")
         .on("click", handleClickE);
     
     // P
     legend.append("circle")
-        .attr("class", "legend-P")
+        .attr("class", "legend circle-P")
         .attr("r", 5).attr("cx", 100).attr("cy", 13)
         .on("click", handleClickP);;;
 
     legend.append("text")
         .attr("x", 115).attr("y", 18)
+        .attr("class", "legend")
         .text("Type P")
         .on("click", handleClickP);
 
