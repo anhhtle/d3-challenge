@@ -1,4 +1,4 @@
-const margin = {top: 20, right: 80, bottom: 100, left: 50},
+const margin = {top: 20, right: 95, bottom: 100, left: 50},
     width = 960 - margin.left - margin.right,
     height = 500 - margin.top - 50;
 
@@ -240,7 +240,7 @@ d3.json('stock.json', (json) => {
         .enter()
         .append("circle")
         .attr("class", (d) => {return d.tradeType})
-        .attr("r", 2)
+        .attr("r", 3)
         .attr("cx", (d) => {return x(d.time)})
         .attr("cy", (d) => {return y(d.price)})
         .on("mouseover", handleTradeMouseOver)
