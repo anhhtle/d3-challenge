@@ -43,21 +43,22 @@ let midArea = d3.area()
     .y0((d) => {return y(d.bid);})
     .y1((d) => {return y(d.ask);});
 
-// define lines
-let askLine = d3.line()
-    .curve(d3.curveStepAfter)
-    .x((d) => {return x(d.timeStr);})
-    .y((d) => {return y(d.ask);});
+//** don't need lines >> used area instead
 
-let bidLine = d3.line()
-    .curve(d3.curveStepAfter)
-    .x((d) => {return x(d.timeStr);})
-    .y((d) => {return y(d.bid);});
+// let askLine = d3.line()
+//     .curve(d3.curveStepAfter)
+//     .x((d) => {return x(d.timeStr);})
+//     .y((d) => {return y(d.ask);});
+
+// let bidLine = d3.line()
+//     .curve(d3.curveStepAfter)
+//     .x((d) => {return x(d.timeStr);})
+//     .y((d) => {return y(d.bid);});
 
 // zoom
 function zoomHandler(){
     let transform = d3.zoomTransform(svg.node());
-    svg.attr("transform", "translate(" + transform.x + "," + transform.y + ") scale(" + transform.k + ")");
+    svg.attr("transform", "translate(" + transform.x + "," + transform.y + ")scale(" + transform.k + ")");
 };
 
 let zoom = d3.zoom()
@@ -136,16 +137,17 @@ d3.json('stock.json', (json) => {
         .attr("d", topArea)
         .attr("class", "topArea");
 
-    // add lines
-    svg.append("path")
-        .data([data])
-        .attr("d", askLine)
-        .attr("class", "line");
+    //*** don't need lines >>> used area instead
+
+    // svg.append("path")
+    //     .data([data])
+    //     .attr("d", askLine)
+    //     .attr("class", "line");
     
-    svg.append("path")
-        .data([data])
-        .attr("d", bidLine)
-        .attr("class", "line");
+    // svg.append("path")
+    //     .data([data])
+    //     .attr("d", bidLine)
+    //     .attr("class", "line");
 
 
     // add Axis
@@ -247,4 +249,3 @@ d3.json('stock.json', (json) => {
         .on("mouseout", () => { d3.select('.infobox').text('')});
 
 });
-    //{"time":34574353918784,"price":233200,"shares":100,"tradeType":"E","orderReferenceNumber":13983473}

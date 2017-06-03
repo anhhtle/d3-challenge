@@ -55,20 +55,9 @@
 
 /************** mouse-over ***********/
 
-.mouse-line {
-  fill: none;
-  stroke: #6F257F;
-  stroke-width: 5px;
-}
-
 .overlay {
   fill: none;
   pointer-events: all;
-}
-
-.focus circle {
-  fill: #F1F3F3;
-  stroke: #6F257F;
 }
   
 .hover-line {
